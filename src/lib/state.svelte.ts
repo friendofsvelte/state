@@ -8,12 +8,14 @@ type TypeRegistry = {
 
 declare global {
 	// @ts-ignore
-	type Pods = TypeRegistry;
+	type PodTypeRegistry = TypeRegistry;
 }
 
-type GetTypeFromRegistry<K extends keyof Pods> = Pods[K] extends never ? unknown : Pods[K];
+type GetTypeFromRegistry<K extends keyof PodTypeRegistry> = PodTypeRegistry[K] extends never
+	? unknown
+	: PodTypeRegistry[K];
 
-function track<K extends keyof Pods, V = GetTypeFromRegistry<K>>(
+function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
 	key: K,
 	storage: StorageType,
 	context?: V
@@ -42,12 +44,12 @@ function track<K extends keyof Pods, V = GetTypeFromRegistry<K>>(
 }
 
 /**
- * Set or get a persistent state from storage, or initialize with an optional context.
+ * Get a persistent state from storage, or initialize with an optional context.
  * @param key - The key to store the state.
  * @param storage - The storage type to use.
  * @param context - The initial state or override.
  */
-export function pod<K extends keyof Pods>(
+export function pod<K extends keyof PodTypeRegistry>(
 	key: K,
 	storage: StorageType = 'localStorage',
 	context?: GetTypeFromRegistry<K>

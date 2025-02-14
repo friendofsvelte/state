@@ -1,7 +1,5 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { PodTypes } from '$lib/state.svelte.js';
-
 declare global {
 	namespace App {
 		// interface Error {}
@@ -11,7 +9,7 @@ declare global {
 		// interface Platform {}
 	}
 
-	interface Pods {
+	interface PodTypeRegistry {
 		layout: {
 			bg: string;
 		};
