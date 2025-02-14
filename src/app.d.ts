@@ -8,6 +8,18 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	interface GlobalTypeRegistry {
+		layout: {
+			bg: string;
+		};
+		// Add more types as needed
+		userSettings: {
+			theme: 'light' | 'dark';
+			fontSize: number;
+		};
+		// etc...
+	}
 }
 
 export {};

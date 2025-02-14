@@ -2,8 +2,26 @@ import { untrack } from 'svelte';
 
 type StorageType = 'localStorage' | 'sessionStorage';
 
-function track<K, V>(key: K, storage: StorageType, context?: V) {
-	let state = $state<V>(context ?? ({} as V)); // Default to empty object
+// Type registry to store types for different keys
+type TypeRegistry = {
+	[K in PropertyKey]: unknown;
+};
+
+// Declare module augmentation for global type registry
+declare global {
+	type GlobalTypeRegistry = TypeRegistry
+}
+
+// Helper type to get type from registry
+type GetTypeFromRegistry<K extends keyof GlobalTypeRegistry> =
+	GlobalTypeRegistry[K] extends never ? unknown : GlobalTypeRegistry[K];
+
+function track<K extends keyof GlobalTypeRegistry, V = GetTypeFromRegistry<K>>(
+	key: K,
+	storage: StorageType,
+	context?: V
+) {
+	let state = $state<V>(context ?? ({} as V));
 
 	if (typeof window !== 'undefined') {
 		if (context === undefined) {
@@ -32,10 +50,10 @@ function track<K, V>(key: K, storage: StorageType, context?: V) {
  * @param storage - The storage type to use.
  * @param context - The initial state or override.
  */
-export function glorified<K, V>(
+export function glorified<K extends keyof GlobalTypeRegistry>(
 	key: K,
 	storage: StorageType = 'localStorage',
-	context?: V
-): V {
+	context?: GetTypeFromRegistry<K>
+): GetTypeFromRegistry<K> {
 	return track(key, storage, context);
 }
