@@ -2,21 +2,18 @@ import { untrack } from 'svelte';
 
 type StorageType = 'localStorage' | 'sessionStorage';
 
-// Type registry to store types for different keys
 type TypeRegistry = {
 	[K in PropertyKey]: unknown;
 };
 
-// Declare module augmentation for global type registry
 declare global {
-	type GlobalTypeRegistry = TypeRegistry
+	// @ts-ignore
+	type Pods = TypeRegistry;
 }
 
-// Helper type to get type from registry
-type GetTypeFromRegistry<K extends keyof GlobalTypeRegistry> =
-	GlobalTypeRegistry[K] extends never ? unknown : GlobalTypeRegistry[K];
+type GetTypeFromRegistry<K extends keyof Pods> = Pods[K] extends never ? unknown : Pods[K];
 
-function track<K extends keyof GlobalTypeRegistry, V = GetTypeFromRegistry<K>>(
+function track<K extends keyof Pods, V = GetTypeFromRegistry<K>>(
 	key: K,
 	storage: StorageType,
 	context?: V
@@ -45,12 +42,12 @@ function track<K extends keyof GlobalTypeRegistry, V = GetTypeFromRegistry<K>>(
 }
 
 /**
- * Get a persistent state from storage, or initialize with an optional context.
+ * Set or get a persistent state from storage, or initialize with an optional context.
  * @param key - The key to store the state.
  * @param storage - The storage type to use.
  * @param context - The initial state or override.
  */
-export function glorified<K extends keyof GlobalTypeRegistry>(
+export function pod<K extends keyof Pods>(
 	key: K,
 	storage: StorageType = 'localStorage',
 	context?: GetTypeFromRegistry<K>

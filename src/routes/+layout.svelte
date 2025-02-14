@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../app.css';
-	import { glorified } from '$lib/state.svelte.js';
+	import { pod } from '$lib/state.svelte.js';
 	let { children } = $props();
-	let app = glorified('layout', 'localStorage', {
+	let app = pod('layout', 'localStorage', {
 		bg: 'lightblue',
 	});
 </script>

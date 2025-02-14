@@ -1,7 +1,7 @@
 <script>
-	import { glorified } from '$lib/state.svelte.js';
+	import { pod } from '$lib/state.svelte.js';
 
-	let app = glorified('layout');
+	let app = pod('layout');
 	$inspect(app);
 </script>
 
