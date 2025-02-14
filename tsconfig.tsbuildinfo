@@ -1,0 +1,1 @@
+{"root":["./.svelte-kit/ambient.d.ts","./.svelte-kit/non-ambient.d.ts","./.svelte-kit/types/src/routes/$types.d.ts","./vite.config.ts","./src/app.d.ts","./src/demo.spec.ts","./src/lib/index.ts","./src/lib/state.svelte.ts","./src/routes/page.svelte.test.ts"],"version":"5.7.3"}
