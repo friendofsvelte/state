@@ -1,58 +1,139 @@
-# create-svelte
+# Persistent Svelte 5 State
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+A lightweight, type-safe state management solution for Svelte applications with built-in storage persistence.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Features
 
-## Creating a project
+- 🎯 **Type-safe**: Full TypeScript support with automatic type inference
+- 💾 **Persistent Storage**: Automatic state persistence in localStorage or sessionStorage
+- 🪶 **Lightweight**: Zero dependencies beyond Svelte
+- ⚡ **Reactive**: Seamless integration with Svelte's reactivity system
+- 🔄 **Auto-sync**: Automatically syncs state across components
+- 📦 **Simple API**: Just one function to manage all your state needs
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Installation
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+npm install @friendofsvelte/state
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+## Quick Start
 
-## Building
+1. Define your types in your `app.d.ts`:
 
-To build your library:
+```typescript
+declare global {
+  interface PodTypeRegistry {
+    layout: {
+      bg: string;
+    };
+    userSettings: {
+      theme: 'light' | 'dark';
+      fontSize: number;
+    };
+  }
+}
+
+export {};
+```
+
+2. Use in your components:
+
+```svelte
+<script lang="ts">
+  import { pod } from '@friendofsvelte/state';
+  
+  // Initialize with value
+  let app = pod('layout', 'localStorage', {
+    bg: 'lightblue'
+  });
+  
+  // Or use existing value
+  let settings = pod('userSettings');
+</script>
+
+<div style="background-color: {app.bg}">
+  <!-- Your content -->
+</div>
+```
+
+## API Reference
+
+### `pod<K>(key: K, storage?: StorageType, context?: GetTypeFromRegistry<K>)`
+
+Creates or retrieves a persistent state container.
+
+Parameters:
+- `key`: Unique identifier for the state container
+- `storage`: (Optional) Storage type - 'localStorage' or 'sessionStorage' (default: 'localStorage')
+- `context`: (Optional) Initial state value
+
+Returns:
+- A reactive state object of type `GetTypeFromRegistry<K>`
+
+## Type Safety
+
+Pod State provides complete type safety through TypeScript. The global `PodTypeRegistry` interface allows you to define types for all your state containers in one place:
+
+```typescript
+interface PodTypeRegistry {
+  layout: {
+    bg: string;
+  };
+  userSettings: {
+    theme: 'light' | 'dark';
+    fontSize: number;
+  };
+}
+```
+
+## Examples
+
+### Basic Usage
+
+```svelte
+<script lang="ts">
+  import { pod } from '@friendofsvelte/state';
+  
+  let app = pod('layout', 'localStorage', {
+    bg: 'lightblue'
+  });
+</script>
+
+<button onclick={() => app.bg = 'lightgreen'}>
+  Change Background
+</button>
+```
+
+### Shared State
+
+```svelte
+<!-- ComponentA.svelte -->
+<script>
+  import { pod } from '@friendofsvelte/state';
+  let settings = pod('userSettings');
+</script>
+
+<!-- ComponentB.svelte -->
+<script>
+  import { pod } from '@friendofsvelte/state';
+  let settings = pod('userSettings');
+  // Will automatically sync with ComponentA
+</script>
+```
+
+## Testing
+
+Pod State includes a test suite to ensure reliability. Run tests with:
 
 ```bash
-npm run package
+npm test
 ```
 
-To create a production version of your showcase app:
+## Contributing
 
-```bash
-npm run build
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-You can preview the production build with `npm run preview`.
+## License
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+MIT License - see LICENSE file for details
