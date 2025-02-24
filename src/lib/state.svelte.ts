@@ -9,8 +9,8 @@ type TypeRegistry = {
 
 
 declare global {
-    // @ts-ignore
-    type PodTypeRegistry = TypeRegistry;
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface PodTypeRegistry extends TypeRegistry {}
 }
 
 type GetTypeFromRegistry<K extends keyof PodTypeRegistry> = PodTypeRegistry[K] extends never
@@ -19,7 +19,7 @@ type GetTypeFromRegistry<K extends keyof PodTypeRegistry> = PodTypeRegistry[K] e
 
 
 function makeContextKey<K extends keyof PodTypeRegistry>(key: K, storage: StorageType) {
-    return `${key}__${storage}__pod`;
+    return `${String(key)}__${storage}__pod`;
 }
 
 function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
@@ -68,7 +68,7 @@ function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
 export function pod<K extends keyof PodTypeRegistry>(
     key: K,
     storage: StorageType,
-    // @ts-ignore
+    // @ts-expect-error: To allow the context to be optional
     context?: GetTypeFromRegistry<K> = EMPTY,
     override: boolean = false
 ): GetTypeFromRegistry<K> {
