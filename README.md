@@ -19,7 +19,7 @@ npm install @friendofsvelte/state
 
 ## Quick Start
 
-1. Define your types in your `app.d.ts`:
+1. Define your types in your app.d.ts:
 
 ```typescript
 declare global {
@@ -49,7 +49,7 @@ export {};
   });
   
   // Or use existing value
-  let settings = pod('userSettings');
+  let settings = pod('userSettings', 'sessionStorage');
 </script>
 
 <div style="background-color: {app.bg}">
@@ -59,14 +59,19 @@ export {};
 
 ## API Reference
 
-### `pod<K>(key: K, storage?: StorageType, context?: GetTypeFromRegistry<K>)`
+### `pod<K>(key: K, storage: StorageType, context?: GetTypeFromRegistry<K>, override?: boolean)`
 
 Creates or retrieves a persistent state container.
 
 Parameters:
 - `key`: Unique identifier for the state container
-- `storage`: (Optional) Storage type - 'localStorage' or 'sessionStorage' (default: 'localStorage')
+- `storage`: Storage type - 'localStorage' or 'sessionStorage'
 - `context`: (Optional) Initial state value
+- If `override` is `true`, it writes the `context` to storage regardless of the current stored value.
+- If `override` is `false` and there is no stored value, it writes the `context` to storage.
+- If `override` is `false` and there is a stored value, it uses the stored value instead of the `context`.
+
+The `pod` function passes the `override` parameter to the `track` function.
 
 Returns:
 - A reactive state object of type `GetTypeFromRegistry<K>`
@@ -111,7 +116,7 @@ interface PodTypeRegistry {
 <!-- ComponentA.svelte -->
 <script>
   import { pod } from '@friendofsvelte/state';
-  let settings = pod('userSettings');
+  let settings = pod('userSettings', 'sessionStorage');
 </script>
 
 <!-- ComponentB.svelte -->
@@ -122,17 +127,10 @@ interface PodTypeRegistry {
 </script>
 ```
 
-## Testing
-
-Pod State includes a test suite to ensure reliability. Run tests with:
-
-```bash
-npm test
-```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a [Pull Request](https://github.com/friendofsvelte/state/pulls).
 
 ## License
 
