@@ -1,10 +1,12 @@
-import { untrack } from 'svelte';
+import { getContext, setContext, untrack } from 'svelte';
+const EMPTY = Symbol('___empty____');
 
 type StorageType = 'localStorage' | 'sessionStorage';
 
 type TypeRegistry = {
     [K in PropertyKey]: unknown;
 };
+
 
 declare global {
     // @ts-ignore
@@ -15,13 +17,22 @@ type GetTypeFromRegistry<K extends keyof PodTypeRegistry> = PodTypeRegistry[K] e
     ? unknown
     : PodTypeRegistry[K];
 
+
+function makeContextKey<K extends keyof PodTypeRegistry>(key: K, storage: StorageType) {
+    return `${key}__${storage}__pod`;
+}
+
 function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
     key: K,
     storage: StorageType,
     context?: V,
     override: boolean = false
 ) {
-    let state = $state<V>(context ?? ({} as V));
+    const contextKey = makeContextKey(key, storage);
+    if (context === EMPTY) {
+        return getContext(contextKey) as V;
+    }
+    let state = $state<V>(context as V);
 
     if (typeof window !== 'undefined') {
         const storedValue = untrack(() => window[storage].getItem(String(key)));
@@ -36,14 +47,15 @@ function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
             const json = JSON.stringify($state.snapshot(state));
             window[storage].setItem(String(key), json);
         }
-
-        $effect.pre(() => {
-            const json = JSON.stringify($state.snapshot(state));
-            window[storage].setItem(String(key), json);
-        });
+        if (context !== EMPTY) {
+            $effect.pre(() => {
+                const json = JSON.stringify($state.snapshot(state));
+                window[storage].setItem(String(key), json);
+            });
+        }
     }
 
-    return state;
+    return setContext(contextKey, state);
 }
 
 /**
@@ -55,8 +67,9 @@ function track<K extends keyof PodTypeRegistry, V = GetTypeFromRegistry<K>>(
  */
 export function pod<K extends keyof PodTypeRegistry>(
     key: K,
-    storage: StorageType = 'localStorage',
-    context?: GetTypeFromRegistry<K>,
+    storage: StorageType,
+    // @ts-ignore
+    context?: GetTypeFromRegistry<K> = EMPTY,
     override: boolean = false
 ): GetTypeFromRegistry<K> {
     return track(key, storage, context, override);
