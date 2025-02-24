@@ -122,7 +122,7 @@ interface PodTypeRegistry {
 <!-- ComponentB.svelte -->
 <script>
   import { pod } from '@friendofsvelte/state';
-  let settings = pod('userSettings');
+  let settings = pod('userSettings', 'sessionStorage');
   // Will automatically sync with ComponentA
 </script>
 ```
