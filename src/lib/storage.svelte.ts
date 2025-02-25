@@ -30,7 +30,7 @@ export class PersistentState<T> {
     }
   }
 
-  get current() {
+  get current(): T {
     this.#version;
 
     const root =
@@ -90,7 +90,7 @@ export class PersistentState<T> {
     return proxy(root);
   }
 
-  set current(value) {
+  set current(value: T) {
     if (typeof this.#storage !== 'undefined') {
       this.#storage.setItem(this.#key, JSON.stringify(value));
     }
