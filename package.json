@@ -1,7 +1,7 @@
 {
 	"name": "@friendofsvelte/state",
 	"description": "Persistent Svelte 5 State, localStorage & sessionStorage",
-	"version": "0.0.6-up",
+	"version": "0.0.6-ts",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
