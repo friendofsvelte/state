@@ -19,78 +19,65 @@ npm install @friendofsvelte/state
 
 ## Quick Start
 
-1. Define your types in your app.d.ts:
+1. Define your state using `PersistentState`:
 
 ```typescript
-declare global {
-  interface PodTypeRegistry {
-    layout: {
-      bg: string;
-    };
-    userSettings: {
-      theme: 'light' | 'dark';
-      fontSize: number;
-    };
-  }
-}
+// new.svelte.ts / js
+import { PersistentState } from '@friendofsvelte/state';
 
-export {};
+export const box = new PersistentState('box', {
+  color: '#ff3e00',
+  dimensions: [100, 100]
+}, 'sessionStorage');
 ```
 
 2. Use in your components:
 
 ```svelte
 <script lang="ts">
-  import { pod } from '@friendofsvelte/state';
-  
-  // Initialize with value
-  let app = pod('layout', 'localStorage', {
-    bg: 'lightblue'
-  });
-  
-  // Or use existing value
-  let settings = pod('userSettings', 'sessionStorage');
+  import { box } from '$lib/new.svelte';
+
+  const listColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+
+  function switchNextColor() {
+    const currentIndex = listColors.indexOf(box.current.color);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= listColors.length) {
+      box.current.color = listColors[0];
+    } else {
+      box.current.color = listColors[nextIndex];
+    }
+  }
 </script>
 
-<div style="background-color: {app.bg}">
-  <!-- Your content -->
+<div
+  style="background-color: {box.current.color}; width: 100px; height: 100px; color: gray; text-align: center;"
+  class="m-2 rounded-2xl"
+>
+  {box.current.color}
 </div>
+
+<button onclick={switchNextColor} class="bg-gray-700 m-2 px-3 rounded-2xl text-gray-200">
+  Change color
+</button>
 ```
 
 ## API Reference
 
-### `pod<K>(key: K, storage: StorageType, context?: GetTypeFromRegistry<K>, override?: boolean)`
+### `PersistentState<T>(key: string, initial?: T, storageType: StorageType = 'localStorage')`
 
 Creates or retrieves a persistent state container.
 
 Parameters:
 - `key`: Unique identifier for the state container
-- `storage`: Storage type - 'localStorage' or 'sessionStorage'
-- `context`: (Optional) Initial state value
-- If `override` is `true`, it writes the `context` to storage regardless of the current stored value.
-- If `override` is `false` and there is no stored value, it writes the `context` to storage.
-- If `override` is `false` and there is a stored value, it uses the stored value instead of the `context`.
-
-The `pod` function passes the `override` parameter to the `track` function.
+- `initial`: (Optional) Initial state value
+- `storageType`: (Optional) Storage type - 'localStorage' or 'sessionStorage' (default: 'localStorage')
 
 Returns:
-- A reactive state object of type `GetTypeFromRegistry<K>`
+- A reactive state object of type `T`
 
-## Type Safety
+> Inspired by: Rich-Harris' [local-storage-test](https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts)
 
-Pod State provides complete type safety through TypeScript. The global `PodTypeRegistry` interface allows you to define types for all your state containers in one place:
-
-```typescript
-interface PodTypeRegistry {
-  layout: {
-    bg: string;
-  };
-  userSettings: {
-    theme: 'light' | 'dark';
-    fontSize: number;
-  };
-}
-```
 
 ## Examples
 
@@ -98,35 +85,28 @@ interface PodTypeRegistry {
 
 ```svelte
 <script lang="ts">
-  import { pod } from '@friendofsvelte/state';
-  
-  let app = pod('layout', 'localStorage', {
-    bg: 'lightblue'
-  });
+  import { PersistentState } from '@friendofsvelte/state';
+
+  const box = new PersistentState('box', {
+    color: '#ff3e00',
+    dimensions: [100, 100]
+  }, 'sessionStorage');
+
+  function switchNextColor() {
+    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+    const currentIndex = colors.indexOf(box.current.color);
+    box.current.color = colors[(currentIndex + 1) % colors.length];
+  }
 </script>
 
-<button onclick={() => app.bg = 'lightgreen'}>
-  Change Background
+<div style="background-color: {box.current.color}; width: 100px; height: 100px; color: gray; text-align: center;" class="m-2 rounded-2xl">
+  {box.current.color}
+</div>
+
+<button onclick={switchNextColor} class="bg-gray-700 m-2 px-3 rounded-2xl text-gray-200">
+  Change color
 </button>
 ```
-
-### Shared State
-
-```svelte
-<!-- ComponentA.svelte -->
-<script>
-  import { pod } from '@friendofsvelte/state';
-  let settings = pod('userSettings', 'sessionStorage');
-</script>
-
-<!-- ComponentB.svelte -->
-<script>
-  import { pod } from '@friendofsvelte/state';
-  let settings = pod('userSettings', 'sessionStorage');
-  // Will automatically sync with ComponentA
-</script>
-```
-
 
 ## Contributing
 
