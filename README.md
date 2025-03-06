@@ -76,7 +76,7 @@ Parameters:
 Returns:
 - A reactive state object of type `T`
 
-> Inspired by: Rich-Harris' [local-storage-test](https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts)
+> Based on, Rich-Harris' [local-storage-test](https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts)
 
 
 ## Examples

@@ -1,4 +1,4 @@
-// See our inspiration: https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts
+// Based on: https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts
 
 import { tick } from 'svelte';
 
