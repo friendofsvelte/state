@@ -9,7 +9,7 @@ export class PersistentState<T> {
   #version = $state(0);
   #listeners = 0;
   #value: T | undefined;
-  #storage: Storage;
+  #storage: Storage | undefined;
 
   #handler = (e: StorageEvent) => {
     if (e.storageArea !== this.#storage) return;
@@ -21,7 +21,12 @@ export class PersistentState<T> {
   constructor(key: string, initial?: T, storageType: StorageType = 'localStorage') {
     this.#key = key;
     this.#value = initial;
-    this.#storage = storageType === 'localStorage' ? localStorage : sessionStorage;
+
+    if (storageType === 'localStorage' && typeof localStorage !== 'undefined') {
+      this.#storage = localStorage;
+    } else if (storageType === 'sessionStorage' && typeof sessionStorage !== 'undefined') {
+      this.#storage = sessionStorage;
+    }
 
     if (typeof this.#storage !== 'undefined') {
       if (this.#storage.getItem(key) === null) {
