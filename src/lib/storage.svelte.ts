@@ -19,6 +19,10 @@ export class PersistentState<T> {
   };
 
   constructor(key: string, initial?: T, storageType: StorageType = 'localStorage') {
+    if (!key) {
+      throw new Error('PersistentState: key must be a non-empty string');
+    }
+
     this.#key = key;
     this.#value = initial;
 
@@ -30,7 +34,11 @@ export class PersistentState<T> {
 
     if (typeof this.#storage !== 'undefined') {
       if (this.#storage.getItem(key) === null) {
-        this.#storage.setItem(key, JSON.stringify(initial));
+        try {
+          this.#storage.setItem(key, JSON.stringify(initial));
+        } catch {
+          // Storage full or unavailable — continue with in-memory fallback
+        }
       }
     }
   }
@@ -38,10 +46,16 @@ export class PersistentState<T> {
   get current(): T {
     this.#version;
 
-    const root =
-      typeof this.#storage !== 'undefined'
-        ? JSON.parse(this.#storage.getItem(this.#key) as any)
-        : this.#value;
+    let root: T | undefined;
+    if (typeof this.#storage !== 'undefined') {
+      try {
+        root = JSON.parse(this.#storage.getItem(this.#key) as string);
+      } catch {
+        root = this.#value;
+      }
+    } else {
+      root = this.#value;
+    }
 
     const proxies = new WeakMap();
 
@@ -62,7 +76,11 @@ export class PersistentState<T> {
             Reflect.set(target, property, value);
 
             if (typeof this.#storage !== 'undefined') {
-              this.#storage.setItem(this.#key, JSON.stringify(root));
+              try {
+                this.#storage.setItem(this.#key, JSON.stringify(root));
+              } catch {
+                // Storage full or unavailable
+              }
             }
 
             return true;
@@ -92,12 +110,16 @@ export class PersistentState<T> {
         };
       });
     }
-    return proxy(root);
+    return proxy(root) as T;
   }
 
   set current(value: T) {
     if (typeof this.#storage !== 'undefined') {
-      this.#storage.setItem(this.#key, JSON.stringify(value));
+      try {
+        this.#storage.setItem(this.#key, JSON.stringify(value));
+      } catch {
+        // Storage full or unavailable
+      }
     }
 
     this.#version += 1;
