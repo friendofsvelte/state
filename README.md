@@ -25,40 +25,45 @@ npm install @friendofsvelte/state
 // new.svelte.ts / js
 import { PersistentState } from '@friendofsvelte/state';
 
-export const box = new PersistentState('box', {
-  color: '#ff3e00',
-  dimensions: [100, 100]
-}, 'sessionStorage');
+export const box = new PersistentState(
+	'box',
+	{
+		color: '#ff3e00',
+		dimensions: [100, 100]
+	},
+	'sessionStorage'
+);
 ```
 
 2. Use in your components:
 
 ```svelte
 <script lang="ts">
-  import { box } from '$lib/new.svelte';
+	import { box } from '$lib/new.svelte';
 
-  const listColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+	const listColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
 
-  function switchNextColor() {
-    const currentIndex = listColors.indexOf(box.current.color);
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= listColors.length) {
-      box.current.color = listColors[0];
-    } else {
-      box.current.color = listColors[nextIndex];
-    }
-  }
+	function switchNextColor() {
+		const currentIndex = listColors.indexOf(box.current.color);
+		const nextIndex = currentIndex + 1;
+		if (nextIndex >= listColors.length) {
+			box.current.color = listColors[0];
+		} else {
+			box.current.color = listColors[nextIndex];
+		}
+	}
 </script>
 
 <div
-  style="background-color: {box.current.color}; width: 100px; height: 100px; color: gray; text-align: center;"
-  class="m-2 rounded-2xl"
+	style="background-color: {box.current
+		.color}; width: 100px; height: 100px; color: gray; text-align: center;"
+	class="m-2 rounded-2xl"
 >
-  {box.current.color}
+	{box.current.color}
 </div>
 
-<button onclick={switchNextColor} class="bg-gray-700 m-2 px-3 rounded-2xl text-gray-200">
-  Change color
+<button onclick={switchNextColor} class="m-2 rounded-2xl bg-gray-700 px-3 text-gray-200">
+	Change color
 </button>
 ```
 
@@ -69,15 +74,16 @@ export const box = new PersistentState('box', {
 Creates or retrieves a persistent state container.
 
 Parameters:
+
 - `key`: Unique identifier for the state container
 - `initial`: (Optional) Initial state value
 - `storageType`: (Optional) Storage type - 'localStorage' or 'sessionStorage' (default: 'localStorage')
 
 Returns:
+
 - A reactive state object of type `T`
 
 > Based on, Rich-Harris' [local-storage-test](https://github.com/Rich-Harris/local-storage-test/blob/main/src/lib/storage.svelte.ts)
-
 
 ## Examples
 
@@ -85,26 +91,34 @@ Returns:
 
 ```svelte
 <script lang="ts">
-  import { PersistentState } from '@friendofsvelte/state';
+	import { PersistentState } from '@friendofsvelte/state';
 
-  const box = new PersistentState('box', {
-    color: '#ff3e00',
-    dimensions: [100, 100]
-  }, 'sessionStorage');
+	const box = new PersistentState(
+		'box',
+		{
+			color: '#ff3e00',
+			dimensions: [100, 100]
+		},
+		'sessionStorage'
+	);
 
-  function switchNextColor() {
-    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
-    const currentIndex = colors.indexOf(box.current.color);
-    box.current.color = colors[(currentIndex + 1) % colors.length];
-  }
+	function switchNextColor() {
+		const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+		const currentIndex = colors.indexOf(box.current.color);
+		box.current.color = colors[(currentIndex + 1) % colors.length];
+	}
 </script>
 
-<div style="background-color: {box.current.color}; width: 100px; height: 100px; color: gray; text-align: center;" class="m-2 rounded-2xl">
-  {box.current.color}
+<div
+	style="background-color: {box.current
+		.color}; width: 100px; height: 100px; color: gray; text-align: center;"
+	class="m-2 rounded-2xl"
+>
+	{box.current.color}
 </div>
 
-<button onclick={switchNextColor} class="bg-gray-700 m-2 px-3 rounded-2xl text-gray-200">
-  Change color
+<button onclick={switchNextColor} class="m-2 rounded-2xl bg-gray-700 px-3 text-gray-200">
+	Change color
 </button>
 ```
 
