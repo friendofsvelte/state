@@ -28,9 +28,20 @@ jobs:
         run: npm ci
 
       - name: Version and publish
+        id: publish
         run: |
           npx changeset version
-          npx changeset publish
+
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          OUTPUT=$(npx changeset publish 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "published"; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -42,5 +53,16 @@ jobs:
           git diff --staged --quiet && exit 0
           git commit -m "chore: version packages"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub release
+        if: steps.publish.outputs.published == 'true'
+        run: |
+          VERSION="${{ steps.publish.outputs.version }}"
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --generate-notes \
+            --target main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
