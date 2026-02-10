@@ -22,6 +22,6 @@
 	{box.current.color}
 </div>
 
-<button onclick={switchNextColor} class="bg-gray-700 m-2 px-3 rounded-2xl text-gray-200"
+<button onclick={switchNextColor} class="m-2 rounded-2xl bg-gray-700 px-3 text-gray-200"
 	>Change color</button
 >
